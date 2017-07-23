@@ -1,0 +1,9 @@
+.board-grid {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.board-row {
+    display: flex;
+    flex-flow: row nowrap;
+}
