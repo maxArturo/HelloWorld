@@ -1,14 +1,17 @@
 import * as React from 'react';
 import './Grid.css';
-import * as Board from '../lib/Board';
+import Board from '../lib/Board';
 import Block from '../Components/Block';
+import BoardBuilder from '../lib/BoardBuilder';
 
 export default class Grid extends React.Component<{}, {}> {
-  private board: Board.Board;
+  private board: Board;
+  private boardBuilder: BoardBuilder;
 
   constructor() {
     super();
-    this.board = new Board.Board(6);
+    this.board = new Board(3);
+    this.boardBuilder = new BoardBuilder(this.board); 
   }
 
   render() {
@@ -20,7 +23,7 @@ export default class Grid extends React.Component<{}, {}> {
               <div className="board-row" key={i}>
                 {row.map((node, j) => {
                   return (
-                    <Block color={node.color} key={j} />
+                    <Block color={node.color} key={j} onClick={() => {this.boardBuilder.traverseStep(); }} />
                   );
                 })}
               </div>

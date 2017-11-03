@@ -1,7 +1,15 @@
-import { Color } from './Board';
+import Color from './Color';
 
-export class Node {
-  constructor(public color: Color) {}
+export interface NodeInterface {
+  touching: boolean;
+  visited: boolean;
+  color: Color;
+  text: String;
 }
 
-export default Node;
+export default class Node implements NodeInterface {
+  public touching: boolean;
+  public visited: boolean;
+  public text: String;
+  constructor(public color: Color) {}
+}

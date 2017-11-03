@@ -1,36 +1,46 @@
-import { Node } from './Node';
+import Node from './Node';
 
-export enum Color {
-  White = 'white',
-  Black = 'black',
-  Gray = 'gray'
+import { NodeInterface } from './Node';
+import Color from './Color';
+
+export interface BoardInterface {
+  state: NodeInterface[][];
+  size: number;
+  isWallAdjacent: (input: number[]) => boolean;
+  getAdjacentVertexNodeCoordinates: (input: number[]) => NodeInterface[];
+  nodeAt: (input: number[]) => NodeInterface;
 }
 
-export class Board {
-  public state: Node[][];
-  private initialNodeSeed: boolean;
+export default class Board implements BoardInterface {
+  public state: NodeInterface[][];
+  public filled: boolean;
+  public size: number;
 
   constructor(public boardSize: number) {
-    this.initialNodeSeed = Math.floor(Math.random() * 10) % 2 === 0;
+    this.size = boardSize;
     this.buildNewBoard(boardSize);
   }
 
+  public isWallAdjacent([x, y]: number[]): boolean {
+    return x === 0 || (x === this.size - 1)
+      || y === 0 || (y === this.size - 1);
+  }
+
+  public getAdjacentVertexNodeCoordinates([x, y]: number[]): NodeInterface[] {
+    return [
+        [x + 1, y + 1], [x - 1, y - 1], [x + 1, y - 1], [x - 1, y + 1],
+        [x + 1, y], [x - 1, y], [x, y - 1], [x, y + 1]
+      ]
+      .filter(el => el[0] >= 0 && el[0] < this.size && el[1] >= 0 && el[1] < this.size)
+      .map(el => this.nodeAt(el));
+  }
+
+  public nodeAt([x, y]: number[]): NodeInterface {
+    return this.state[x][y];
+  }
+
   private buildNewBoard(boardSize: number) {
-    this.state = [];
-    let whiteOrBlack: boolean = this.initialNodeSeed;
-
-    for (let i: number = 0; i < boardSize; i++) {
-      this.state.push([]);
-
-      for (let j: number = 0; j < boardSize; j++) {
-        if (whiteOrBlack) {
-          this.state[i][j] = new Node(Color.White);
-        } else {
-          this.state[i][j] = new Node(Color.Black);
-        }
-        whiteOrBlack = !whiteOrBlack;
-      }
-      whiteOrBlack = !whiteOrBlack;
-    }
+    const row = new Array(this.size).fill(new Node(Color.White));
+    this.state = new Array(this.size).fill(row);
   }
 }
