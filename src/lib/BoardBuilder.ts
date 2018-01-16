@@ -1,66 +1,92 @@
 import { BoardInterface } from './Board';
-import { getRandomBinary } from '../util/random';
+import { NodeInterface } from './Node';
+import Color from './Color';
+// import { getRandomBinary } from '../util/random';
 
 /*
  * The BoardBuilder class is in charge of the construction
- * and solution of a 
+ * and initializing the solution of a Hitori board
  */
 export default class BoardBuilder {
+  public completed: boolean;
+
   private board: BoardInterface;
-  private traverseIndex: number[];
-  private completed: boolean;
+  private currIndex: number[];
 
   constructor(newBoard: BoardInterface) {
     this.board = newBoard;
-    this.traverseIndex = [0, 0];
+    this.currIndex = [0, 0];
   }
 
   public traverseStep() {
     if (!this.completed) {
+      console.log('passing through node: ', this.currIndex);
       this.markNode(); 
       this.setNextIndex();
-      if (getRandomBinary()) {
-        this.setNextIndex(); 
+    }
+  }
+
+  private setNextIndex(): void {
+    const idx = this.currIndex;
+    idx[1] = (idx[1] + 1) % this.board.size;
+
+    if (idx[1] === 0) {
+      idx[0]++;
+    }
+
+    if (idx[0] >= this.board.size) {
+      this.completed = true;
+    }
+    this.currIndex = idx;
+  }
+
+  private markNode(): void {
+    if (this.canBeMarked(this.currIndex)) {
+      console.log('this node can be marked:', this.currIndex);
+      const node = this.board.nodeAt(this.currIndex);
+      if (this.isNode(node)) {
+
+        console.log('marking this node: ', node);
+        node.marked = true;
+        node.color = Color.Black;
+        if (this.isWallAdjacent(this.currIndex)) {
+          node.walled = true;
+        }
       }
     }
   }
 
-  private markNode() {
-    const board = this.board;
-    const currNode = board.nodeAt(this.traverseIndex);
-    // const touching = board.isWallAdjacent(this.traverseIndex);
-
-    // if (touching) {
-    //   currNode.touching = true;
-    // }
-
-    const adjacents = board.getAdjacentVertexNodeCoordinates(this.traverseIndex);
-
+  private canBeMarked([x, y]: number[]): boolean {
+    return !this.hasMarkedNeigbhors([x, y])
+    && !this.isWalling([x, y])
+    && Math.random() > 0.5;
   }
 
-  private setNextIndex() {
-    const board = this.board;
+  private isWallAdjacent([x, y]: number[]): boolean {
+    return x === 0 || (x === this.board.size - 1)
+      || y === 0 || (y === this.board.size - 1);
+  }
 
-    if (!this.completed) {
-      const idx = this.traverseIndex;
-      // mark current node as visited
-      board[idx[0]][idx[1]].visited = true;
+  private isWalling([x, y]: number[]): boolean {
+    const wallingNeigbhors = [[x + 1, y + 1], [x - 1, y - 1], [x + 1, y - 1], [x - 1, y + 1]]
+      .map(el => this.board.nodeAt(el))
+      .filter(this.isNode)
+      .filter(el => el.walled);
 
-      const nextRow = (idx[0] + 1) % this.board.size;
-      idx[0] = nextRow;
+    return wallingNeigbhors.length >= 2 || 
+      this.isWallAdjacent([x, y]) && wallingNeigbhors.length > 0;
+  }
 
-      // move to the next row if needed
-      if (nextRow === 0) {
-        idx[1]++;
-      }
+  private hasMarkedNeigbhors([x, y]: number[]): boolean {
+    return [[x + 1, y], [x - 1, y], [x, y - 1], [x, y + 1]]
+      .map(el => {
+        return this.board.nodeAt(el);
+      })
+      .filter(this.isNode)
+      .some(el => el.marked);
+  }
 
-      if (idx[1] >= this.board.size) {
-        this.completed = true;
-        return;
-      }
-
-      console.log(`this is the current index: ${this.traverseIndex}`);
-      this.traverseIndex = idx;
-    }
+  private isNode(maybeNode: NodeInterface | void): maybeNode is NodeInterface {
+    return (<NodeInterface> maybeNode) !== undefined;
   }
 }
