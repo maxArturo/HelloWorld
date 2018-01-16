@@ -19,6 +19,7 @@ export default class BoardBuilder {
 
   public traverseStep() {
     if (!this.completed) {
+      console.log('at node: ', this.currIndex);
       this.markNode();
       this.setNextIndex();
     }
@@ -39,6 +40,7 @@ export default class BoardBuilder {
   }
 
   private markNode(): void {
+    console.log('analyzing node: ', this.currIndex);
     if (this.canBeMarked(this.currIndex)) {
       const node = this.board.nodeAt(this.currIndex);
       if (this.isNode(node)) {
@@ -46,13 +48,25 @@ export default class BoardBuilder {
         node.marked = true;
         node.color = Color.Black;
         if (this.isWallAdjacent(this.currIndex) || this.wallingNeigbhors(this.currIndex).length > 0) {
+          console.log('WALLING this node')
           node.walled = true;
+          console.log('and WALLING its neigbhors')
+          // TODO make this recursive for all vertex marked neigbhors
+          this.vertexNeigbhors(this.currIndex)
+            .filter(n => n.marked)
+            .map(n => n.walled = true);
         }
       }
     }
   }
 
   private canBeMarked([x, y]: number[]): boolean {
+    const hasMarkedNeigbhors = this.hasMarkedNeigbhors([x, y]);
+    const isWalling = this.isWalling([x, y]);
+    console.log('hasMarkedNeigbhors:', hasMarkedNeigbhors);
+    console.log('wallingNeigbhors', this.wallingNeigbhors(this.currIndex));
+    console.log('iswalling :', isWalling);
+
     return !this.hasMarkedNeigbhors([x, y])
       && !this.isWalling([x, y])
       && Math.random() > 0.5;
@@ -63,11 +77,14 @@ export default class BoardBuilder {
       || y === 0 || (y === this.board.size - 1);
   }
 
-  private wallingNeigbhors([x, y]: number[]): NodeInterface[] {
+  private vertexNeigbhors([x, y]: number[]): NodeInterface[] {
     return [[x + 1, y + 1], [x - 1, y - 1], [x + 1, y - 1], [x - 1, y + 1]]
       .map(el => this.board.nodeAt(el))
-      .filter(this.isNode)
-      .filter(el => el.walled);
+      .filter(this.isNode);
+  }
+
+  private wallingNeigbhors([x, y]: number[]): NodeInterface[] {
+    return this.vertexNeigbhors([x, y]).filter(el => el.walled);
   }
 
   private isWalling([x, y]: number[]): boolean {
