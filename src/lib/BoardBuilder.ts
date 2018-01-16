@@ -1,7 +1,6 @@
 import { BoardInterface } from './Board';
 import { NodeInterface } from './Node';
 import Color from './Color';
-// import { getRandomBinary } from '../util/random';
 
 /*
  * The BoardBuilder class is in charge of the construction
@@ -20,8 +19,7 @@ export default class BoardBuilder {
 
   public traverseStep() {
     if (!this.completed) {
-      console.log('passing through node: ', this.currIndex);
-      this.markNode(); 
+      this.markNode();
       this.setNextIndex();
     }
   }
@@ -42,14 +40,12 @@ export default class BoardBuilder {
 
   private markNode(): void {
     if (this.canBeMarked(this.currIndex)) {
-      console.log('this node can be marked:', this.currIndex);
       const node = this.board.nodeAt(this.currIndex);
       if (this.isNode(node)) {
 
-        console.log('marking this node: ', node);
         node.marked = true;
         node.color = Color.Black;
-        if (this.isWallAdjacent(this.currIndex)) {
+        if (this.isWallAdjacent(this.currIndex) || this.wallingNeigbhors(this.currIndex).length > 0) {
           node.walled = true;
         }
       }
@@ -58,8 +54,8 @@ export default class BoardBuilder {
 
   private canBeMarked([x, y]: number[]): boolean {
     return !this.hasMarkedNeigbhors([x, y])
-    && !this.isWalling([x, y])
-    && Math.random() > 0.5;
+      && !this.isWalling([x, y])
+      && Math.random() > 0.5;
   }
 
   private isWallAdjacent([x, y]: number[]): boolean {
@@ -67,13 +63,16 @@ export default class BoardBuilder {
       || y === 0 || (y === this.board.size - 1);
   }
 
-  private isWalling([x, y]: number[]): boolean {
-    const wallingNeigbhors = [[x + 1, y + 1], [x - 1, y - 1], [x + 1, y - 1], [x - 1, y + 1]]
+  private wallingNeigbhors([x, y]: number[]): NodeInterface[] {
+    return [[x + 1, y + 1], [x - 1, y - 1], [x + 1, y - 1], [x - 1, y + 1]]
       .map(el => this.board.nodeAt(el))
       .filter(this.isNode)
       .filter(el => el.walled);
+  }
 
-    return wallingNeigbhors.length >= 2 || 
+  private isWalling([x, y]: number[]): boolean {
+    const wallingNeigbhors = this.wallingNeigbhors([x, y]);
+    return wallingNeigbhors.length >= 2 ||
       this.isWallAdjacent([x, y]) && wallingNeigbhors.length > 0;
   }
 

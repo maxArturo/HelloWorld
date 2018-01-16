@@ -12,7 +12,7 @@ export default class Grid extends React.Component<{}, {board: Map<String, NodeIn
 
   constructor() {
     super();
-    this.board = new Board(6);
+    this.board = new Board(7);
     this.boardBuilder = new BoardBuilder(this.board); 
     this.state = {
       board: this.board.state
@@ -28,7 +28,6 @@ export default class Grid extends React.Component<{}, {board: Map<String, NodeIn
   }
 
   render() {
-    console.log('rerendering...');
     const tiles = Array.from(this.state.board.values());
     const tileArray = Array.from(new Array(this.board.size).keys()).map(el => tiles.splice(0, this.board.size));
     return (
