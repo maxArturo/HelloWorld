@@ -25,9 +25,13 @@ export default class Board implements BoardInterface {
 
   private buildNewBoard(boardSize: number) {
     const boardMap = new Map<String, Node>();
+    let id = 0;
     for (let i = 0; i < this.size; i++) {
       for (let j = 0; j < this.size; j++) {
-        boardMap.set(`${i},${j}`, new Node(Color.White));
+        const newNode = new Node(Color.White);
+        newNode.coordinates = [i, j];
+        newNode.id = id++;
+        boardMap.set(`${i},${j}`, newNode);
       }
     }
     this.state = boardMap;

@@ -48,16 +48,28 @@ export default class BoardBuilder {
         node.marked = true;
         node.color = Color.Black;
         if (this.isWallAdjacent(this.currIndex) || this.wallingNeigbhors(this.currIndex).length > 0) {
-          console.log('WALLING this node')
-          node.walled = true;
-          console.log('and WALLING its neigbhors')
-          // TODO make this recursive for all vertex marked neigbhors
-          this.vertexNeigbhors(this.currIndex)
-            .filter(n => n.marked)
-            .map(n => n.walled = true);
+          this.wallNeigbhors(this.currIndex);
         }
       }
     }
+  }
+
+  private wallNeigbhors(nodeLoc: number[]): void {
+    const node = this.board.nodeAt(nodeLoc);
+    if (this.isNode(node)) {
+      console.log('WALLING this node', node)
+      node.walled = true;
+    }
+
+    console.log('and WALLING its neigbhors')
+    this.vertexNeigbhors(nodeLoc)
+      .filter(n => n.marked)
+      .map(n => {
+        if (!n.walled) {
+          n.walled = true;
+          this.wallNeigbhors(n.coordinates);
+        }
+      });
   }
 
   private canBeMarked([x, y]: number[]): boolean {
@@ -83,14 +95,22 @@ export default class BoardBuilder {
       .filter(this.isNode);
   }
 
-  private wallingNeigbhors([x, y]: number[]): NodeInterface[] {
-    return this.vertexNeigbhors([x, y]).filter(el => el.walled);
+  private uniqueIDNeigbhors(coordinates: number[]): boolean {
+    // TODO implement this function, then use algo to make sure no closed cycles
+    const vertexAdjacent = this.vertexNeigbhors(coordinates);
+    return vertexAdjacent
+      .map(el => el.id)
+      .filter((val, index, s) => );
   }
 
-  private isWalling([x, y]: number[]): boolean {
-    const wallingNeigbhors = this.wallingNeigbhors([x, y]);
-    return wallingNeigbhors.length >= 2 ||
-      this.isWallAdjacent([x, y]) && wallingNeigbhors.length > 0;
+  private wallingNeigbhors(coordinates: number[]): NodeInterface[] {
+    return this.vertexNeigbhors(coordinates).filter(el => el.walled);
+  }
+
+  private isWalling(coordinates: number[]): boolean {
+    const wallingNeigbhorCount = this.wallingNeigbhors(coordinates).length;
+    return wallingNeigbhorCount >= 2 ||
+      this.isWallAdjacent(coordinates) && wallingNeigbhorCount > 0;
   }
 
   private hasMarkedNeigbhors([x, y]: number[]): boolean {
