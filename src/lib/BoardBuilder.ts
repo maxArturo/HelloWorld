@@ -52,31 +52,37 @@ export default class BoardBuilder {
   private markNode(node: NodeInterface): void {
     node.marked = true;
     node.color = Color.Black;
+    const coordinates = node.coordinates;
 
     // propagate walled status
     if (
-      this.isWallAdjacent(this.currIndex) ||
-      this.wallingNeigbhors(this.currIndex).length > 0
+      this.isWallAdjacent(coordinates) ||
+      this.wallingNeigbhors(coordinates).length > 0
     ) {
-      this.wallNeigbhors(this.currIndex);
+      this.wallNeigbhors(coordinates);
     }
 
-    // propagate same id to indicate graph connectivity
-    this.propagateId(this.currIndex);
+    // pick graph ID to propagate 
+    const adjacent = this.vertexNeigbhors(coordinates).filter(n => n.marked);
+    if (adjacent.length) {
+      const graphID = adjacent[0].id;
+
+      // propagate same id to indicate graph connectivity
+      this.propagateId(coordinates, graphID);
+    }
   }
 
-  private propagateId(coordinates: number[]): void {
-    const node = this.board.nodeAt(this.currIndex);
+  private propagateId(coordinates: number[], graphID: number): void {
+    const node = this.board.nodeAt(coordinates);
     if (this.isNode(node)) {
-      const adjacent = this.vertexNeigbhors(coordinates).filter(n => n.marked);
+      node.id = graphID;
+      const adjacent = this.vertexNeigbhors(coordinates).filter(n => n.marked && n.id !== graphID);
 
       if (adjacent.length) {
-        const refId = adjacent[0].id;
-        node.id = refId;
+        console.log(`current coords: ${coordinates}:${node.id}, adjacent: ${adjacent.map(el => `${el.coordinates}:${el.id}`)}`)
 
         adjacent
-          .filter(el => el.id !== refId)
-          .map(currNode => this.propagateId(currNode.coordinates));
+          .map(currNode => this.propagateId(currNode.coordinates, graphID));
       }
     }
   }
@@ -84,11 +90,11 @@ export default class BoardBuilder {
   private wallNeigbhors(nodeLoc: number[]): void {
     const node = this.board.nodeAt(nodeLoc);
     if (this.isNode(node)) {
-      console.log('WALLING this node', node);
+      // console.log('WALLING this node', node);
       node.walled = true;
     }
 
-    console.log('and WALLING its neigbhors');
+    // console.log('and WALLING its neigbhors');
     this.vertexNeigbhors(nodeLoc)
       .filter(n => n.marked)
       .map(n => {
@@ -129,7 +135,13 @@ export default class BoardBuilder {
   private vertexNeigbhors([x, y]: number[]): NodeInterface[] {
     return [[x + 1, y + 1], [x - 1, y - 1], [x + 1, y - 1], [x - 1, y + 1]]
       .map(el => this.board.nodeAt(el))
-      .filter(this.isNode);
+      .filter(this.isNode)
+      .sort((a, b) => {
+        const xDiff = a.coordinates[0] - b.coordinates[0];
+        const yDiff = a.coordinates[1] - b.coordinates[1];
+
+        return xDiff || yDiff;
+      });
   }
 
   private uniqueIDNeigbhors(coordinates: number[]): boolean {
