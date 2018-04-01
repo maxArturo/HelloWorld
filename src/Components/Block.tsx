@@ -20,7 +20,6 @@ export default class Block extends React.Component<BlockProps, {}> {
         style={{backgroundColor: this.props.color}}
         onClick={this.props.onClick}
       >
-      {this.props.coordinates[0]},{this.props.coordinates[1]}
       </div>
     );
   }

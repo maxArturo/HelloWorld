@@ -16,7 +16,7 @@ export default class Grid extends React.Component<
 
   constructor() {
     super();
-    this.board = new Board(20);
+    this.board = new Board(8);
     this.boardBuilder = new BoardBuilder(this.board);
     this.updateBoard = this.updateBoard.bind(this);
 
