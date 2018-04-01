@@ -9,15 +9,23 @@ import { NodeInterface } from '../lib/Node';
 export default class Grid extends React.Component<{}, {board: Map<String, NodeInterface>}> {
   private board: Board;
   private boardBuilder: BoardBuilder;
+  private runAll = true;
 
   constructor() {
     super();
     this.board = new Board(8);
     this.boardBuilder = new BoardBuilder(this.board); 
+    this.updateBoard = this.updateBoard.bind(this);
+
+    if (this.runAll) {
+      while (!this.boardBuilder.completed) {
+        this.boardBuilder.traverseStep();
+      }
+    }
+
     this.state = {
       board: this.board.state
     };
-    this.updateBoard = this.updateBoard.bind(this);
   }
 
   updateBoard() {
