@@ -5,34 +5,42 @@ import Block from '../Components/Block';
 import BoardBuilder from '../lib/BoardBuilder';
 
 import { NodeInterface } from '../lib/Node';
+export interface GridPropsInterface {
+  boardSize: number;
+}
+export interface GridStateInterface {
+  board: Map<String, NodeInterface>;
+}
 
 export default class Grid extends React.Component<
-  {},
-  { board: Map<String, NodeInterface> }
+  GridPropsInterface,
+  GridStateInterface
 > {
   private board: Board;
   private boardBuilder: BoardBuilder;
   private runAll = true;
 
-  constructor() {
-    super();
-    this.board = new Board(8);
+  constructor(props: GridPropsInterface) {
+    super(props);
+    this.generateSolvedBoard(props.boardSize);
+    this.state = {
+      board: this.board.state,
+    };
+  }
+
+  generateSolvedBoard(boardSize: number) {
+    this.board = new Board(boardSize);
     this.boardBuilder = new BoardBuilder(this.board);
-    this.updateBoard = this.updateBoard.bind(this);
 
     if (this.runAll) {
       while (!this.boardBuilder.completed) {
         this.boardBuilder.traverseStep();
       }
     }
-
-    this.state = {
-      board: this.board.state,
-    };
   }
 
-  updateBoard() {
-    this.boardBuilder.traverseStep();
+  componentWillReceiveProps(nextProps: GridPropsInterface) {
+    this.generateSolvedBoard(nextProps.boardSize);
     this.setState({
       board: this.board.state,
     });
@@ -54,7 +62,7 @@ export default class Grid extends React.Component<
                     color={node.color}
                     coordinates={node.coordinates}
                     key={j}
-                    onClick={this.updateBoard}
+                    onClick={() => {}}
                   />
                 );
               })}

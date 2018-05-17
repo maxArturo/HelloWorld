@@ -1,0 +1,36 @@
+.game-controls {
+  margin: 0.83em;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-controls a {
+  color: steelblue;
+}
+
+.game-controls div {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+
+.game-controls button {
+  margin: 0 10px;
+  border-radius: 5px;
+}
+
+.game-controls a:link {
+  text-decoration: none;
+}
+
+.game-controls a:visited {
+  text-decoration: none;
+}
+
+.game-controls a:hover {
+  text-decoration: underline;
+}
+
+.game-controls a:active {
+  text-decoration: underline;
+}
