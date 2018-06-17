@@ -7,6 +7,7 @@ export interface BoardInterface {
   state: Map<String, NodeInterface>;
   size: number;
   nodeAt: (input: number[]) => NodeInterface | void;
+  getUnmarkedNodes(): NodeInterface[];
 }
 
 export default class Board implements BoardInterface {
@@ -23,6 +24,10 @@ export default class Board implements BoardInterface {
     return this.state.get(`${x},${y}`);
   }
 
+  public getUnmarkedNodes(): NodeInterface[] {
+    return Array.from(this.state.values()).filter(e => !e.marked);
+  }
+
   private buildNewBoard(boardSize: number) {
     const arrayFiller = Array(this.size)
       .fill(0)
@@ -34,6 +39,8 @@ export default class Board implements BoardInterface {
       for (let j = 0; j < this.size; j++) {
         const newNode = new Node(Color.White);
         newNode.coordinates = [i, j];
+        newNode.x = i;
+        newNode.y = j;
         newNode.id = id++;
         newNode.solutionSet = arrayFiller;
         boardMap.set(`${i},${j}`, newNode);

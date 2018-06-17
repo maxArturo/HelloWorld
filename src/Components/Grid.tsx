@@ -36,8 +36,6 @@ export default class Grid extends React.Component<
       while (!this.boardBuilder.completed) {
         this.boardBuilder.traverseStep();
       }
-
-      this.boardBuilder.placeNumbers();
     }
   }
 
