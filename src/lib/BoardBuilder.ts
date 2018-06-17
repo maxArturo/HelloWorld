@@ -1,6 +1,7 @@
 import { BoardInterface } from './Board';
 import { NodeInterface } from './Node';
 import Color from './Color';
+import * as lodash from 'lodash';
 
 /*
  * The BoardBuilder class is in charge of the construction
@@ -11,6 +12,7 @@ export default class BoardBuilder {
 
   private board: BoardInterface;
   private currIndex: number[];
+  private solutionMap: Map<string, Map<string, boolean>>;
 
   constructor(newBoard: BoardInterface) {
     this.board = newBoard;
@@ -21,6 +23,56 @@ export default class BoardBuilder {
     if (!this.completed) {
       this.processNode();
       this.setNextIndex();
+    }
+  }
+
+  public placeNumbers(): void {
+    this.solutionMap = new Map<string, Map<string, boolean>>();
+
+    const arrayFiller = Array(this.board.size)
+      .fill(0)
+      .map((e, i) => i.toString(10));
+
+    // initialize the solution map
+    ['c', 'r'].map(direction => {
+      arrayFiller.map(el => {
+        const locationMap = new Map<string, boolean>();
+        arrayFiller.map(num => {
+          locationMap.set(num, true);
+        });
+        this.solutionMap.set(`${direction}${el}`, locationMap);
+      });
+    });
+
+    // iterate and fill the map
+
+    arrayFiller.map(x => {
+      arrayFiller.map(y => {
+        const node = this.board.state.get(`${x},${y}`);
+        if (this.isNode(node) && !node.marked) {
+          this.setNodeSolution(node);
+        }
+      });
+    });
+  }
+
+  private setNodeSolution(node: NodeInterface): void {
+    const colNumbers = this.solutionMap.get(`c${node.coordinates[0]}`);
+    const rowNumbers = this.solutionMap.get(`r${node.coordinates[1]}`);
+
+    if (colNumbers && rowNumbers) {
+      const solNumber = lodash.sample(
+        lodash.intersection(
+          Array.from(colNumbers.keys()),
+          Array.from(rowNumbers.keys()),
+        ),
+      );
+
+      if (solNumber) {
+        node.solutionNumber = solNumber;
+        colNumbers.delete(solNumber);
+        rowNumbers.delete(solNumber);
+      }
     }
   }
 

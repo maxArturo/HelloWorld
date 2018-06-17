@@ -36,6 +36,8 @@ export default class Grid extends React.Component<
       while (!this.boardBuilder.completed) {
         this.boardBuilder.traverseStep();
       }
+
+      this.boardBuilder.placeNumbers();
     }
   }
 
@@ -61,6 +63,7 @@ export default class Grid extends React.Component<
                   <Block
                     color={node.color}
                     coordinates={node.coordinates}
+                    value={node.solutionNumber}
                     key={j}
                     onClick={() => {}}
                   />

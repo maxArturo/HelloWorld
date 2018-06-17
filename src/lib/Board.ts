@@ -24,6 +24,10 @@ export default class Board implements BoardInterface {
   }
 
   private buildNewBoard(boardSize: number) {
+    const arrayFiller = Array(this.size)
+      .fill(0)
+      .map((e, i) => i.toString(10));
+
     const boardMap = new Map<String, Node>();
     let id = 0;
     for (let i = 0; i < this.size; i++) {
@@ -31,6 +35,7 @@ export default class Board implements BoardInterface {
         const newNode = new Node(Color.White);
         newNode.coordinates = [i, j];
         newNode.id = id++;
+        newNode.solutionSet = arrayFiller;
         boardMap.set(`${i},${j}`, newNode);
       }
     }

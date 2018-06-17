@@ -14,7 +14,7 @@ export default class Controls extends React.Component<
     return (
       <div className="game-controls">
         <div className="toggles">
-          <div>{this.props.size}x</div>
+          <p>{this.props.size}x</p>
           <button
             onClick={() =>
               this.props.size > 3 &&
@@ -23,7 +23,6 @@ export default class Controls extends React.Component<
           >
             -
           </button>
-
           <button
             onClick={() => this.changeBoardSize((size: number) => size + 1)}
           >

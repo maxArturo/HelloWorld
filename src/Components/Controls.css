@@ -8,6 +8,10 @@
   color: steelblue;
 }
 
+.game-controls p {
+  line-height: 1;
+}
+
 .game-controls div {
   display: flex;
   justify-content: center;
@@ -17,6 +21,7 @@
 .game-controls button {
   margin: 0 10px;
   border-radius: 5px;
+  min-height: 30px;
 }
 
 .game-controls a:link {
