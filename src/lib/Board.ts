@@ -7,7 +7,7 @@ export interface BoardInterface {
   state: Map<String, NodeInterface>;
   size: number;
   nodeAt: (input: number[]) => NodeInterface | void;
-  getUnmarkedNodes(): NodeInterface[];
+  getUnSolvedNodes(): NodeInterface[];
 }
 
 export default class Board implements BoardInterface {
@@ -24,8 +24,10 @@ export default class Board implements BoardInterface {
     return this.state.get(`${x},${y}`);
   }
 
-  public getUnmarkedNodes(): NodeInterface[] {
-    return Array.from(this.state.values()).filter(e => !e.marked);
+  public getUnSolvedNodes(): NodeInterface[] {
+    return Array.from(this.state.values()).filter(
+      e => !e.solutionNumber && !e.marked,
+    );
   }
 
   private buildNewBoard(boardSize: number) {

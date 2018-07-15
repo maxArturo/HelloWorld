@@ -23,6 +23,12 @@ export default class BoardBuilder {
     }
   }
 
+  public getUnSolvedNodes(): NodeInterface[] {
+    return Array.from(this.board.state.values()).filter(
+      el => this.isNode(el) && !el.marked,
+    );
+  }
+
   private setNextIndex(): void {
     const idx = this.currIndex;
     idx[1] = (idx[1] + 1) % this.board.size;
@@ -160,12 +166,6 @@ export default class BoardBuilder {
       })
       .filter(this.isNode)
       .some(el => el.marked);
-  }
-
-  private getUnmarkedNodes(): NodeInterface[] {
-    return Array.from(this.board.state.values()).filter(
-      el => this.isNode(el) && !el.marked,
-    );
   }
 
   private isNode(maybeNode: NodeInterface | void): maybeNode is NodeInterface {

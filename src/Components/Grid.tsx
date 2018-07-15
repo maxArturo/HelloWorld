@@ -5,6 +5,7 @@ import Block from '../Components/Block';
 import BoardBuilder from '../lib/BoardBuilder';
 
 import { NodeInterface } from '../lib/Node';
+import BoardSolver from '../lib/BoardSolver';
 export interface GridPropsInterface {
   boardSize: number;
 }
@@ -26,6 +27,8 @@ export default class Grid extends React.Component<
     this.state = {
       board: this.board.state,
     };
+
+    this.fillInNumbers = this.fillInNumbers.bind(this);
   }
 
   generateSolvedBoard(boardSize: number) {
@@ -41,9 +44,14 @@ export default class Grid extends React.Component<
 
   componentWillReceiveProps(nextProps: GridPropsInterface) {
     this.generateSolvedBoard(nextProps.boardSize);
+    this.fillInNumbers();
     this.setState({
       board: this.board.state,
     });
+  }
+
+  fillInNumbers() {
+    new BoardSolver(this.board);
   }
 
   render() {
@@ -63,7 +71,7 @@ export default class Grid extends React.Component<
                     coordinates={node.coordinates}
                     value={node.solutionNumber}
                     key={j}
-                    onClick={() => {}}
+                    onClick={this.fillInNumbers}
                   />
                 );
               })}

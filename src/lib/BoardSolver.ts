@@ -8,7 +8,6 @@ export default class BoardSolver {
   private cols: string[][];
   private rows: string[][];
   private availableValues: string[];
-  private unmarkedNodes: NodeInterface[];
 
   constructor(newBoard: BoardInterface) {
     this.board = newBoard;
@@ -16,43 +15,48 @@ export default class BoardSolver {
       .fill(0)
       .map((_, i) => i.toString(10));
 
-    this.cols = this.rows = this.availableValues.map(_ => []);
-    this.unmarkedNodes = this.board.getUnmarkedNodes();
+    this.cols = this.availableValues.map(_ => []);
+    this.rows = this.availableValues.map(_ => []);
 
-    this.solveBoard();
+    console.log(new Date());
+    this.solveBoard(this.board.getUnSolvedNodes());
+    console.log(new Date());
   }
 
-  public solveBoard(): boolean {
-    // pick a valid node
-    // TODO pop a random node out of here
-    const node = lodash.sample(this.unmarkedNodes);
-
-    if (!node) {
+  public solveBoard(nodes: NodeInterface[]): boolean {
+    if (!nodes.length) {
       // if no nodes left, you're done
       return true;
     }
 
-    // get all possible solution options
-    const solOptions = lodash.difference(
-      this.availableValues,
-      lodash.union(this.cols[node.x], this.rows[node.y]),
-    );
+    for (const node of nodes) {
+      // get all possible solution options
+      const solOptions = lodash.difference(
+        this.availableValues,
+        lodash.union(this.rows[node.x], this.cols[node.y]),
+      );
 
-    if (!solOptions.length) {
-      // no solution possible
-      return false;
-    }
+      if (!solOptions.length) {
+        // no solution possible
+        return false;
+      }
 
-    // pick a valid number for this node
-    for (const possibleSolution of solOptions) {
-      this.cols[node.x].push(possibleSolution);
-      this.cols[node.y].push(possibleSolution);
-      // TODO remove this solution from cols and rows; try another solution
-      if (!this.solveBoard()) break;
-    }
+      // pick a valid number for this node
+      for (const possibleSolution of lodash.shuffle(solOptions)) {
+        // mark the node, add it to the list of cols and rows
+        this.rows[node.x].push(possibleSolution);
+        this.cols[node.y].push(possibleSolution);
+        node.solutionNumber = possibleSolution;
 
-    if (solNumber) {
-      // found a solution, update
+        if (this.solveBoard(this.board.getUnSolvedNodes())) {
+          return true;
+        }
+
+        // unmark the node, remove from cols and rows
+        this.rows[node.x].pop();
+        this.cols[node.y].pop();
+        node.solutionNumber = '';
+      }
     }
 
     return false;
