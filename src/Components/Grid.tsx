@@ -24,6 +24,7 @@ export default class Grid extends React.Component<
   constructor(props: GridPropsInterface) {
     super(props);
     this.generateSolvedBoard(props.boardSize);
+    this.fillInNumbers();
     this.state = {
       board: this.board.state,
     };

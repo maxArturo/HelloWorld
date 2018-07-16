@@ -112,7 +112,7 @@ export default class BoardBuilder {
       !this.hasMarkedNeigbhors(coordinates) &&
       !this.isWalling(coordinates) &&
       this.uniqueIDNeigbhors(coordinates) &&
-      Math.random() > 0.5
+      Math.random() > 0.3
     );
   }
 

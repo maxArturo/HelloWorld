@@ -18,9 +18,9 @@ export default class BoardSolver {
     this.cols = this.availableValues.map(_ => []);
     this.rows = this.availableValues.map(_ => []);
 
-    console.log(new Date());
+    console.log(new Date(), 'starting');
     this.solveBoard(this.board.getUnSolvedNodes());
-    console.log(new Date());
+    console.log(new Date(), 'ended');
   }
 
   public solveBoard(nodes: NodeInterface[]): boolean {
@@ -48,7 +48,9 @@ export default class BoardSolver {
         this.cols[node.y].push(possibleSolution);
         node.solutionNumber = possibleSolution;
 
-        if (this.solveBoard(this.board.getUnSolvedNodes())) {
+        // get a new array without
+
+        if (this.solveBoard(lodash.differenceBy(nodes, [node], el => el.id))) {
           return true;
         }
 

@@ -17,15 +17,17 @@ export default class Controls extends React.Component<
           <p>{this.props.size}x</p>
           <button
             onClick={() =>
-              this.props.size > 1 &&
-              this.props.size <= 5 &&
+              this.props.size > 3 &&
               this.changeBoardSize((size: number) => size - 1)
             }
           >
             -
           </button>
           <button
-            onClick={() => this.changeBoardSize((size: number) => size + 1)}
+            onClick={() =>
+              this.props.size < 18 &&
+              this.changeBoardSize((size: number) => size + 1)
+            }
           >
             +
           </button>
