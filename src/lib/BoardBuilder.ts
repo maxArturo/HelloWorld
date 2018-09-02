@@ -1,7 +1,6 @@
 import { BoardInterface } from './Board';
 import { NodeInterface } from './Node';
 import Color from './Color';
-
 /*
  * The BoardBuilder class is in charge of the construction
  * and initializing the solution of a Hitori board
@@ -19,12 +18,15 @@ export default class BoardBuilder {
 
   public traverseStep() {
     if (!this.completed) {
-      console.log('at node: ', `${this.currIndex}`);
       this.processNode();
       this.setNextIndex();
-    } else {
-      console.log('board complete, nothing to do');
     }
+  }
+
+  public getUnSolvedNodes(): NodeInterface[] {
+    return Array.from(this.board.state.values()).filter(
+      el => this.isNode(el) && !el.marked,
+    );
   }
 
   private setNextIndex(): void {
@@ -42,10 +44,11 @@ export default class BoardBuilder {
   }
 
   private processNode(): void {
-    console.log('analyzing node: ', this.currIndex);
     if (this.canBeMarked(this.currIndex)) {
       const node = this.board.nodeAt(this.currIndex);
-      this.isNode(node) && this.markNode(node);
+      if (this.isNode(node)) {
+        this.markNode(node);
+      }
     }
   }
 
@@ -62,7 +65,7 @@ export default class BoardBuilder {
       this.wallNeigbhors(coordinates);
     }
 
-    // pick graph ID to propagate 
+    // pick graph ID to propagate
     const adjacent = this.vertexNeigbhors(coordinates).filter(n => n.marked);
     if (adjacent.length) {
       const graphID = adjacent[0].id;
@@ -76,13 +79,14 @@ export default class BoardBuilder {
     const node = this.board.nodeAt(coordinates);
     if (this.isNode(node)) {
       node.id = graphID;
-      const adjacent = this.vertexNeigbhors(coordinates).filter(n => n.marked && n.id !== graphID);
+      const adjacent = this.vertexNeigbhors(coordinates).filter(
+        n => n.marked && n.id !== graphID,
+      );
 
       if (adjacent.length) {
-        console.log(`current coords: ${coordinates}:${node.id}, adjacent: ${adjacent.map(el => `${el.coordinates}:${el.id}`)}`)
-
-        adjacent
-          .map(currNode => this.propagateId(currNode.coordinates, graphID));
+        adjacent.map(currNode =>
+          this.propagateId(currNode.coordinates, graphID),
+        );
       }
     }
   }
@@ -90,11 +94,9 @@ export default class BoardBuilder {
   private wallNeigbhors(nodeLoc: number[]): void {
     const node = this.board.nodeAt(nodeLoc);
     if (this.isNode(node)) {
-      // console.log('WALLING this node', node);
       node.walled = true;
     }
 
-    // console.log('and WALLING its neigbhors');
     this.vertexNeigbhors(nodeLoc)
       .filter(n => n.marked)
       .map(n => {
@@ -106,20 +108,11 @@ export default class BoardBuilder {
   }
 
   private canBeMarked(coordinates: number[]): boolean {
-    const hasMarkedNeigbhors = this.hasMarkedNeigbhors(coordinates);
-    const isWalling = this.isWalling(coordinates);
-    const uniqueIdNeigbhors = this.uniqueIDNeigbhors(coordinates);
-
-    console.log('hasMarkedNeigbhors:', hasMarkedNeigbhors);
-    console.log('wallingNeigbhors', this.wallingNeigbhors(this.currIndex));
-    console.log('uniqueIdNeigbhors', uniqueIdNeigbhors);
-    console.log('iswalling :', isWalling);
-
     return (
       !this.hasMarkedNeigbhors(coordinates) &&
       !this.isWalling(coordinates) &&
       this.uniqueIDNeigbhors(coordinates) &&
-      Math.random() > 0.5
+      Math.random() > 0.3
     );
   }
 

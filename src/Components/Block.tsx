@@ -5,6 +5,7 @@ import './Block.css';
 export interface BlockProps {
   color: Color;
   coordinates: number[];
+  value: string;
   onClick: () => void;
 }
 
@@ -17,9 +18,10 @@ export default class Block extends React.Component<BlockProps, {}> {
     return (
       <div
         className="board-block"
-        style={{backgroundColor: this.props.color}}
+        style={{ backgroundColor: this.props.color }}
         onClick={this.props.onClick}
       >
+        {this.props.value}
       </div>
     );
   }
