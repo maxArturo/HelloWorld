@@ -4,6 +4,7 @@ export interface ConstraintColumnInterface
   extends ConstraintSolutionNodeInterface {
   count: number;
   main: boolean;
+  id: number;
 }
 
 export default class ConstraintColumn implements ConstraintColumnInterface {
@@ -13,8 +14,10 @@ export default class ConstraintColumn implements ConstraintColumnInterface {
   public right: ConstraintSolutionNodeInterface;
   public count: number;
   public main: boolean;
+  public id: number;
 
-  constructor(main: boolean = false) {
+  constructor(id: number, main: boolean = false) {
+    this.id = id;
     this.up = this;
     this.down = this;
     this.left = this;

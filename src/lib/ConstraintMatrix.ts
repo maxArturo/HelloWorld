@@ -21,7 +21,14 @@ export default class ConstraintMatrix {
     // create constraint column nodes for board columns, rows and no nodes unsolved (n ^ 2 * 3)
     this.solutionColumns = Array(this.board.size ** 2 * 3)
       .fill(0)
-      .map(() => new ConstraintColumn());
+      .map((_, i) => new ConstraintColumn(i))
+      .map((el, i, arr) => {
+        // create links to left, right col nodes
+        const nextEl = arr[(i + 1) % arr.length];
+        el.right = nextEl;
+        nextEl.left = el;
+        return el;
+      });
 
     // iterate through all board node/number combinations
     for (let num = 0; num < this.board.size; num++) {
@@ -40,7 +47,7 @@ export default class ConstraintMatrix {
 
             // add for row
             const constraintRow = this.solutionColumns[
-              this.board.size ** 2 - 1 + num * this.board.size + y
+              this.board.size ** 2 + num * this.board.size + y
             ];
             this.appendToColumn(
               constraintRow,
@@ -50,7 +57,7 @@ export default class ConstraintMatrix {
             // add for cell. If this cell is marked, we don't care about its constraint (optimization)
             if (!currNode.marked) {
               const constraintCell = this.solutionColumns[
-                2 * this.board.size ** 2 - 1 + currNode.id
+                2 * this.board.size ** 2 + currNode.id
               ];
               this.appendToColumn(
                 constraintCell,
@@ -62,8 +69,49 @@ export default class ConstraintMatrix {
       }
     }
 
+    this.addMainNode();
+
+    this.filterUnusedCols();
+    // this.printConstraintMap();
+    console.log(this.solutionColumns);
+  }
+
+  public filterUnusedCols(): void {
+    let currCol: ConstraintColumnInterface = this.main
+      .right as ConstraintColumnInterface;
+    while (!currCol.main) {
+      if (!currCol.count) {
+        currCol.left.right = currCol.right;
+      }
+      currCol = currCol.right as ConstraintColumnInterface;
+    }
+  }
+
+  public printConstraintMap(): void {
+    let currCol: ConstraintColumnInterface = this.main
+      .right as ConstraintColumnInterface;
+
+    while (!currCol.main) {
+      const nodeContents = [];
+
+      let currNode = currCol.down as ConstraintRowInterface;
+      while (currNode.node) {
+        nodeContents.push(
+          `solution ${currNode.solutionNumber} at [${
+            currNode.node.coordinates
+          }]`,
+        );
+        currNode = currNode.down as ConstraintRowInterface;
+      }
+
+      console.log(`constraint col ${currCol.id}: ${nodeContents.join(', ')}`);
+      currCol = currCol.right as ConstraintColumnInterface;
+    }
+  }
+
+  public addMainNode(): void {
     // add a main node, wire it up with the rest of the columns
-    this.main = new ConstraintColumn(true);
+    this.main = new ConstraintColumn(-1, true);
 
     this.main.right = this.solutionColumns[0];
     this.main.right.left = this.main;
@@ -72,10 +120,9 @@ export default class ConstraintMatrix {
     this.main.left.right = this.main;
 
     this.solutionColumns.unshift(this.main);
-    console.log(this.solutionColumns);
   }
 
-  private appendToColumn(
+  public appendToColumn(
     colHead: ConstraintColumnInterface,
     node: ConstraintRowInterface,
   ): void {
