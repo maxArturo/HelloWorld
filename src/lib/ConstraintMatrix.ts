@@ -8,6 +8,11 @@ import ConstraintNode, { ConstraintRowInterface } from './ConstraintNode';
  * with dancing links methods (https://en.wikipedia.org/wiki/Dancing_Links) to generate a solution.
  */
 
+export class ConstraintMatrixInterface {
+  board: BoardInterface;
+  solutionColumns: ConstraintColumnInterface[];
+  main: ConstraintColumnInterface;
+}
 export default class ConstraintMatrix {
   public board: BoardInterface;
   public solutionColumns: ConstraintColumnInterface[];
@@ -40,29 +45,43 @@ export default class ConstraintMatrix {
             const constraintCol = this.solutionColumns[
               num * this.board.size + x
             ];
-            this.appendToColumn(
-              constraintCol,
-              new ConstraintNode(currNode, num + 1),
-            );
+            const constraintColNode = new ConstraintNode(currNode, num + 1);
+            constraintColNode.label = `${num}, ${x}, ${y} col for ${
+              constraintCol.id
+            }`;
+            this.appendToColumn(constraintCol, constraintColNode);
 
             // add for row
             const constraintRow = this.solutionColumns[
               this.board.size ** 2 + num * this.board.size + y
             ];
-            this.appendToColumn(
-              constraintRow,
-              new ConstraintNode(currNode, num + 1),
-            );
+            const constraintRowNode = new ConstraintNode(currNode, num + 1);
+            constraintRowNode.label = `${num}, ${x}, ${y} row for ${
+              constraintRow.id
+            }`;
+            this.appendToColumn(constraintRow, constraintRowNode);
+
+            constraintColNode.right = constraintRowNode;
+            constraintRowNode.left = constraintColNode;
 
             // add for cell. If this cell is marked, we don't care about its constraint (optimization)
             if (!currNode.marked) {
               const constraintCell = this.solutionColumns[
                 2 * this.board.size ** 2 + currNode.id
               ];
-              this.appendToColumn(
-                constraintCell,
-                new ConstraintNode(currNode, num + 1),
-              );
+              const constraintCellNode = new ConstraintNode(currNode, num + 1);
+              constraintCellNode.label = `${num}, ${x}, ${y} cell for ${
+                constraintCell.id
+              }`;
+              this.appendToColumn(constraintCell, constraintCellNode);
+
+              constraintRowNode.right = constraintCellNode;
+              constraintCellNode.left = constraintRowNode;
+              constraintCellNode.right = constraintColNode;
+              constraintColNode.left = constraintCellNode;
+            } else {
+              constraintColNode.left = constraintRowNode;
+              constraintRowNode.right = constraintColNode;
             }
           }
         }
@@ -72,11 +91,11 @@ export default class ConstraintMatrix {
     this.addMainNode();
 
     this.filterUnusedCols();
-    // this.printConstraintMap();
-    console.log(this.solutionColumns);
+    this.printConstraintMap();
+    // console.log(this.solutionColumns);
   }
 
-  public filterUnusedCols(): void {
+  private filterUnusedCols(): void {
     let currCol: ConstraintColumnInterface = this.main
       .right as ConstraintColumnInterface;
     while (!currCol.main) {
@@ -109,7 +128,7 @@ export default class ConstraintMatrix {
     }
   }
 
-  public addMainNode(): void {
+  private addMainNode(): void {
     // add a main node, wire it up with the rest of the columns
     this.main = new ConstraintColumn(-1, true);
 
@@ -122,15 +141,21 @@ export default class ConstraintMatrix {
     this.solutionColumns.unshift(this.main);
   }
 
-  public appendToColumn(
+  private appendToColumn(
     colHead: ConstraintColumnInterface,
     node: ConstraintRowInterface,
   ): void {
-    const last = colHead.up;
-    colHead.up = node;
-    node.down = colHead;
-    node.up = last;
-    last.down = colHead.up;
+    if (colHead.count) {
+      const last = colHead.up;
+      colHead.up = node;
+      node.down = colHead;
+      node.up = last;
+      last.down = colHead.up;
+    } else {
+      colHead.up = colHead.down = node;
+      node.up = node.down = colHead;
+    }
+
     colHead.count++;
   }
 }
