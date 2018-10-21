@@ -23,7 +23,15 @@ export default class ConstraintMatrix {
   }
 
   public generateMatrix(): void {
-    // create constraint column nodes for board columns, rows and no nodes unsolved (n ^ 2 * 3)
+    /* 
+    * We need to represent three types of constraints: 
+    * Each possible number in each row (n numbers * n rows)
+    * Each possible number in each column (n numbers * n columns)
+    * Each cell of the board is filled (n * n cells)
+    * 
+    * For each constraint type, we'll represent it as a series of columns in our constraint matrix. 
+    * We'll have a total of (n ^ 2 * 3) columns. 
+    */
     this.solutionColumns = Array(this.board.size ** 2 * 3)
       .fill(0)
       .map((_, i) => new ConstraintColumn(i))
@@ -49,6 +57,7 @@ export default class ConstraintMatrix {
             constraintColNode.label = `${num}, ${x}, ${y} col for ${
               constraintCol.id
             }`;
+            constraintColNode.column = constraintCol;
             this.appendToColumn(constraintCol, constraintColNode);
 
             // add for row
@@ -59,6 +68,7 @@ export default class ConstraintMatrix {
             constraintRowNode.label = `${num}, ${x}, ${y} row for ${
               constraintRow.id
             }`;
+            constraintRowNode.column = constraintRow;
             this.appendToColumn(constraintRow, constraintRowNode);
 
             constraintColNode.right = constraintRowNode;
@@ -73,6 +83,7 @@ export default class ConstraintMatrix {
               constraintCellNode.label = `${num}, ${x}, ${y} cell for ${
                 constraintCell.id
               }`;
+              constraintCellNode.column = constraintCell;
               this.appendToColumn(constraintCell, constraintCellNode);
 
               constraintRowNode.right = constraintCellNode;
@@ -92,7 +103,6 @@ export default class ConstraintMatrix {
 
     this.filterUnusedCols();
     this.printConstraintMap();
-    // console.log(this.solutionColumns);
   }
 
   private filterUnusedCols(): void {

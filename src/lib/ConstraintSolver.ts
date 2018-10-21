@@ -4,8 +4,12 @@ import { BoardInterface } from './Board';
 import ConstraintMatrix, {
   ConstraintMatrixInterface,
 } from './ConstraintMatrix';
-import { ConstraintSolutionNodeInterface } from './ConstraintNode';
-import { ConstraintColumnInterface } from './ConstraintColumn';
+import ConstraintNode, {
+  ConstraintSolutionNodeInterface,
+} from './ConstraintNode';
+import ConstraintColumn, {
+  ConstraintColumnInterface,
+} from './ConstraintColumn';
 
 /**
  * @class ConstraintSolver implements the Algorithm X, relying on a data structure
@@ -39,5 +43,37 @@ export default class ConstraintSolver {
     if ((this.constraintMatrix.main.right as ConstraintColumnInterface).main) {
       return null;
     }
+  }
+
+  private coverColumn(column: ConstraintColumnInterface): void {
+    column.right.left = column.left;
+    column.left.right = column.right;
+    let node = column.down;
+    while (node !== column) {
+      let rightNode = node.right;
+      while (node !== rightNode) {
+        rightNode.down.up = rightNode.up;
+        rightNode.up.down = rightNode.down;
+        (rightNode as ConstraintNode).column.count--;
+        rightNode = rightNode.right;
+      }
+      node = node.down;
+    }
+  }
+
+  private uncoverColumn(column: ConstraintColumnInterface): void {
+    let node = column.up;
+    while (node !== column) {
+      let leftNode = node.left;
+      while (leftNode !== node) {
+        (leftNode as ConstraintNode).column.count++;
+        leftNode.down.up = leftNode;
+        leftNode.up.down = leftNode;
+        leftNode = leftNode.left;
+      }
+      node = node.up;
+    }
+    column.right.left = column;
+    column.left.right = column;
   }
 }

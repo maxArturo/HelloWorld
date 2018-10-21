@@ -1,4 +1,5 @@
 import { NodeInterface } from './Node';
+import { ConstraintColumnInterface } from './ConstraintColumn';
 
 export interface ConstraintSolutionNodeInterface {
   left: ConstraintSolutionNodeInterface;
@@ -19,6 +20,7 @@ export default class ConstraintNode implements ConstraintRowInterface {
   public right: ConstraintSolutionNodeInterface;
   public up: ConstraintSolutionNodeInterface;
   public down: ConstraintSolutionNodeInterface;
+  public column: ConstraintColumnInterface;
   public node: NodeInterface;
   public solutionNumber: number;
   public label: string;
