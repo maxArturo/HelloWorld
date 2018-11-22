@@ -5,7 +5,7 @@ import Block from '../Components/Block';
 import BoardBuilder from '../lib/BoardBuilder';
 
 import { NodeInterface } from '../lib/Node';
-import ConstraintMatrix from '../lib/ConstraintMatrix';
+import ConstraintSolver from '../lib/ConstraintSolver';
 export interface GridPropsInterface {
   boardSize: number;
 }
@@ -19,13 +19,11 @@ export default class Grid extends React.Component<
 > {
   private board: Board;
   private boardBuilder: BoardBuilder;
-  private constraintMatrix: ConstraintMatrix;
   private runAll = true;
 
   constructor(props: GridPropsInterface) {
     super(props);
     this.generateSolvedBoard(props.boardSize);
-    // this.fillInNumbers();
     this.state = {
       board: this.board.state,
     };
@@ -53,8 +51,7 @@ export default class Grid extends React.Component<
   }
 
   fillInNumbers() {
-    this.constraintMatrix = new ConstraintMatrix(this.board);
-    this.constraintMatrix.generateMatrix();
+    new ConstraintSolver(this.board);
   }
 
   render() {

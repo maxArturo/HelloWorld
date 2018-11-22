@@ -5,13 +5,15 @@ export interface ConstraintColumnInterface
   count: number;
   main: boolean;
   id: number;
+  left: ConstraintColumnInterface;
+  right: ConstraintColumnInterface;
 }
 
 export default class ConstraintColumn implements ConstraintColumnInterface {
   public up: ConstraintSolutionNodeInterface;
   public down: ConstraintSolutionNodeInterface;
-  public left: ConstraintSolutionNodeInterface;
-  public right: ConstraintSolutionNodeInterface;
+  public left: ConstraintColumnInterface;
+  public right: ConstraintColumnInterface;
   public count: number;
   public main: boolean;
   public id: number;

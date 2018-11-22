@@ -11,7 +11,7 @@ class App extends React.Component<{}, AppStateInterface> {
   constructor() {
     super();
     this.state = {
-      gridSize: 3,
+      gridSize: 2,
     };
     this.updateGridSize = this.updateGridSize.bind(this);
   }

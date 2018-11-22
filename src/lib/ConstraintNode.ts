@@ -13,6 +13,7 @@ export interface ConstraintRowInterface
   node: NodeInterface;
   solutionNumber: number;
   label: string;
+  column: ConstraintColumnInterface;
 }
 
 export default class ConstraintNode implements ConstraintRowInterface {

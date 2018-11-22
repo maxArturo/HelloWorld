@@ -5,13 +5,14 @@ import ConstraintNode, { ConstraintRowInterface } from './ConstraintNode';
 
 /**
  * @class ConstraintMatrix: Converts a hitori board into a constraint matrix data structure
- * with dancing links methods (https://en.wikipedia.org/wiki/Dancing_Links) to generate a solution.
+ * needed for dancing links (https://en.wikipedia.org/wiki/Dancing_Links) to generate a solution.
  */
 
-export class ConstraintMatrixInterface {
+export interface ConstraintMatrixInterface {
   board: BoardInterface;
   solutionColumns: ConstraintColumnInterface[];
   main: ConstraintColumnInterface;
+  generateMatrix(): void;
 }
 export default class ConstraintMatrix {
   public board: BoardInterface;
@@ -23,15 +24,15 @@ export default class ConstraintMatrix {
   }
 
   public generateMatrix(): void {
-    /* 
-    * We need to represent three types of constraints: 
-    * Each possible number in each row (n numbers * n rows)
-    * Each possible number in each column (n numbers * n columns)
-    * Each cell of the board is filled (n * n cells)
-    * 
-    * For each constraint type, we'll represent it as a series of columns in our constraint matrix. 
-    * We'll have a total of (n ^ 2 * 3) columns. 
-    */
+    /*
+     * We need to represent three types of constraints:
+     * Each possible number in each row (n numbers * n rows)
+     * Each possible number in each column (n numbers * n columns)
+     * Each cell of the board is filled (n * n cells)
+     *
+     * For each constraint type, we'll represent it as a series of columns in our constraint matrix.
+     * We'll have a total of (n ^ 2 * 3) columns.
+     */
     this.solutionColumns = Array(this.board.size ** 2 * 3)
       .fill(0)
       .map((_, i) => new ConstraintColumn(i))
@@ -54,9 +55,8 @@ export default class ConstraintMatrix {
               num * this.board.size + x
             ];
             const constraintColNode = new ConstraintNode(currNode, num + 1);
-            constraintColNode.label = `${num}, ${x}, ${y} col for ${
-              constraintCol.id
-            }`;
+            constraintColNode.label = `column constraint: no:${num +
+              1} at coordinates(${x}, ${y}) column_id: ${constraintCol.id}`;
             constraintColNode.column = constraintCol;
             this.appendToColumn(constraintCol, constraintColNode);
 
@@ -65,9 +65,8 @@ export default class ConstraintMatrix {
               this.board.size ** 2 + num * this.board.size + y
             ];
             const constraintRowNode = new ConstraintNode(currNode, num + 1);
-            constraintRowNode.label = `${num}, ${x}, ${y} row for ${
-              constraintRow.id
-            }`;
+            constraintRowNode.label = `row constraint: no:${num +
+              1} at coordinates(${x}, ${y}) column_id: ${constraintRow.id}`;
             constraintRowNode.column = constraintRow;
             this.appendToColumn(constraintRow, constraintRowNode);
 
@@ -80,9 +79,8 @@ export default class ConstraintMatrix {
                 2 * this.board.size ** 2 + currNode.id
               ];
               const constraintCellNode = new ConstraintNode(currNode, num + 1);
-              constraintCellNode.label = `${num}, ${x}, ${y} cell for ${
-                constraintCell.id
-              }`;
+              constraintCellNode.label = `cell constraint: no:${num +
+                1} at coords(${x}, ${y}) column_id:${constraintCell.id}`;
               constraintCellNode.column = constraintCell;
               this.appendToColumn(constraintCell, constraintCellNode);
 
@@ -102,6 +100,7 @@ export default class ConstraintMatrix {
     this.addMainNode();
 
     this.filterUnusedCols();
+
     this.printConstraintMap();
   }
 
