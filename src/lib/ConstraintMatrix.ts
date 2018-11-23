@@ -10,7 +10,7 @@ export interface ConstraintMatrixInterface {
   board: BoardInterface;
   solutionColumns: ConstraintColumnInterface[];
   main: ConstraintColumnInterface;
-  generateMatrix(): void;
+  generateMatrix(): number[][];
 }
 export default class ConstraintMatrix {
   public board: BoardInterface;

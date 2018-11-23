@@ -17,12 +17,17 @@ export default class ConstraintSolver {
     this.constraintMatrix = new ConstraintMatrix(board);
 
     const result = this.constraintMatrix.generateMatrix();
-    console.log(result);
-    console.table(result);
     const solution: number[] = sample(solver.solve(result, null, null, 2048));
-    shuffle(solution).map(el => {
-      const x = Math.trunc(el / board.size ** 2);
-      const y = Math.trunc(el / board.size) % board.size;
+
+    const rowColshuffling = [
+      shuffle(Array.from(new Array(board.size).keys())),
+      shuffle(Array.from(new Array(board.size).keys())),
+    ];
+    console.log(rowColshuffling);
+
+    solution.map(el => {
+      const x = rowColshuffling[0][Math.trunc(el / board.size ** 2)];
+      const y = rowColshuffling[1][Math.trunc(el / board.size) % board.size];
 
       const node = board.nodeAt([x, y]);
       if (node) {
