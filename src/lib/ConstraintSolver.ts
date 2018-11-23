@@ -28,7 +28,6 @@ export default class ConstraintSolver {
     currSolution: ConstraintRowInterface[] = [],
     depth = 0,
   ): ConstraintRowInterface[] {
-    console.log('[solveNextConstraint] starting');
     if (this.constraintMatrix.main.right === this.constraintMatrix.main) {
       // if no unsolved constraints remain (no columns to the right of header) return
       return currSolution;
@@ -36,28 +35,31 @@ export default class ConstraintSolver {
     let nextConstraint = this.getLowestCol();
 
     if (nextConstraint !== null) {
-      console.log('[solveNextConstraint] have nextConstraint col, ready');
       this.coverColumn(nextConstraint);
       let nextRow = nextConstraint.down;
-      while (nextRow.down !== nextConstraint) {
+      while (nextRow !== nextConstraint) {
         // add row to our solution
         currSolution.push(nextRow as ConstraintRowInterface);
 
         // cover each column that is satisfied by row
         let rightRow = nextRow.right as ConstraintRowInterface;
-        while (rightRow.right !== nextRow) {
+        while (rightRow !== nextRow) {
           this.coverColumn(rightRow.column);
           rightRow = rightRow.right as ConstraintRowInterface;
         }
         // search recursively
-        this.solveNextConstraint(currSolution, depth);
+
+        const result = this.solveNextConstraint(currSolution, depth + 1);
+        if (result.length) {
+          return result;
+        }
         // solution not found; pop latest row and use its column
         nextRow = currSolution.pop() as ConstraintRowInterface;
         nextConstraint = (nextRow as ConstraintRowInterface).column;
 
         // uncover in reverse order
         let leftRow = nextRow.left as ConstraintRowInterface;
-        while (leftRow.left !== leftRow) {
+        while (leftRow !== nextRow) {
           this.uncoverColumn(leftRow.column);
           leftRow = leftRow.left as ConstraintRowInterface;
         }
@@ -66,7 +68,7 @@ export default class ConstraintSolver {
       this.uncoverColumn(nextConstraint);
     }
 
-    return currSolution;
+    return [];
   }
 
   /*
@@ -75,15 +77,12 @@ export default class ConstraintSolver {
    * it returns the column closest to the right of the head node.
    */
   private getLowestCol(): ConstraintColumnInterface | null {
-    console.log('[getLowestCol] starting');
     if (this.constraintMatrix.main.right === this.constraintMatrix.main) {
-      console.log('[getLowestCol] short-circuit exit');
       return null;
     }
 
     let smallestNumCol = this.constraintMatrix.main.right;
     let nextCol = smallestNumCol.right;
-    console.log('[getLowestCol] initial smallestNumCol: ', smallestNumCol);
 
     while (nextCol !== this.constraintMatrix.main) {
       if (smallestNumCol.count > nextCol.count) {
@@ -92,7 +91,6 @@ export default class ConstraintSolver {
       nextCol = nextCol.right;
     }
 
-    console.log('[getLowestCol] exiting with', smallestNumCol);
     return smallestNumCol;
   }
 
@@ -101,7 +99,6 @@ export default class ConstraintSolver {
    * http://garethrees.org/2007/06/10/zendoku-generation/#section-4.3
    */
   private coverColumn(column: ConstraintColumnInterface): void {
-    console.log('[coverColumn] starting');
     column.right.left = column.left;
     column.left.right = column.right;
     let node = column.down;
@@ -115,7 +112,6 @@ export default class ConstraintSolver {
       }
       node = node.down;
     }
-    console.log('[coverColumn] ending');
   }
 
   /*

@@ -98,20 +98,18 @@ export default class ConstraintMatrix {
     }
 
     this.addMainNode();
-
     this.filterUnusedCols();
-
-    this.printConstraintMap();
+    // this.printConstraintMap();
   }
 
   private filterUnusedCols(): void {
-    let currCol: ConstraintColumnInterface = this.main
-      .right as ConstraintColumnInterface;
-    while (!currCol.main) {
+    let currCol = this.main.right;
+    while (currCol !== this.main) {
       if (!currCol.count) {
         currCol.left.right = currCol.right;
+        currCol.right.left = currCol.left;
       }
-      currCol = currCol.right as ConstraintColumnInterface;
+      currCol = currCol.right;
     }
   }
 
