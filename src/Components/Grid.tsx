@@ -23,12 +23,12 @@ export default class Grid extends React.Component<
 
   constructor(props: GridPropsInterface) {
     super(props);
+    this.fillInNumbers = this.fillInNumbers.bind(this);
+
     this.generateSolvedBoard(props.boardSize);
     this.state = {
       board: this.board.state,
     };
-
-    this.fillInNumbers = this.fillInNumbers.bind(this);
   }
 
   generateSolvedBoard(boardSize: number) {
@@ -40,11 +40,11 @@ export default class Grid extends React.Component<
         this.boardBuilder.traverseStep();
       }
     }
+    this.fillInNumbers();
   }
 
   componentWillReceiveProps(nextProps: GridPropsInterface) {
     this.generateSolvedBoard(nextProps.boardSize);
-    this.fillInNumbers();
     this.setState({
       board: this.board.state,
     });

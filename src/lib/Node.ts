@@ -11,7 +11,6 @@ export interface NodeInterface {
   x: number;
   y: number;
   solutionNumber: string;
-  solutionSet: string[];
 }
 
 export default class Node implements NodeInterface {
@@ -24,6 +23,5 @@ export default class Node implements NodeInterface {
   public x: number;
   public y: number;
   public solutionNumber: string;
-  public solutionSet: string[];
   constructor(public color: Color) {}
 }

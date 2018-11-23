@@ -23,7 +23,6 @@ export default class ConstraintSolver {
       shuffle(Array.from(new Array(board.size).keys())),
       shuffle(Array.from(new Array(board.size).keys())),
     ];
-    console.log(rowColshuffling);
 
     solution.map(el => {
       const x = rowColshuffling[0][Math.trunc(el / board.size ** 2)];

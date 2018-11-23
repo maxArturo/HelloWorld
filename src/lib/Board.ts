@@ -7,7 +7,8 @@ export interface BoardInterface {
   state: Map<String, NodeInterface>;
   size: number;
   nodeAt: (input: number[]) => NodeInterface | void;
-  getUnSolvedNodes(): NodeInterface[];
+  getRowNodes(index: number): NodeInterface[] | void;
+  getColumnNodes(index: number): NodeInterface[] | void;
 }
 
 export default class Board implements BoardInterface {
@@ -17,24 +18,18 @@ export default class Board implements BoardInterface {
 
   constructor(public boardSize: number) {
     this.size = boardSize;
-    this.buildNewBoard(boardSize);
+    Array(this.size).fill([]);
+    this.buildNewBoard();
   }
+
+  public getRowNodes(index: number): NodeInterface[] | void {}
+  public getColumnNodes() {}
 
   public nodeAt([x, y]: number[]): NodeInterface | void {
     return this.state.get(`${x},${y}`);
   }
 
-  public getUnSolvedNodes(): NodeInterface[] {
-    return Array.from(this.state.values()).filter(
-      e => !e.solutionNumber && !e.marked,
-    );
-  }
-
-  private buildNewBoard(boardSize: number) {
-    const arrayFiller = Array(this.size)
-      .fill(0)
-      .map((e, i) => i.toString(10));
-
+  private buildNewBoard() {
     const boardMap = new Map<String, Node>();
     let id = 0;
     for (let i = 0; i < this.size; i++) {
@@ -44,7 +39,6 @@ export default class Board implements BoardInterface {
         newNode.x = i;
         newNode.y = j;
         newNode.id = id++;
-        newNode.solutionSet = arrayFiller;
         boardMap.set(`${i},${j}`, newNode);
       }
     }
