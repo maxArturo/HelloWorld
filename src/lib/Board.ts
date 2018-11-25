@@ -9,7 +9,7 @@ export interface BoardInterface {
   nodeAt: (input: number[]) => NodeInterface | void;
   registerUnmarkedNode(node: NodeInterface): void;
   getUnmarkedRowNodes(index: number): NodeInterface[];
-  getUnregisteredColumnNodes(index: number): NodeInterface[];
+  getUnmarkedColumnNodes(index: number): NodeInterface[];
 }
 
 export default class Board implements BoardInterface {
@@ -20,7 +20,14 @@ export default class Board implements BoardInterface {
 
   constructor(public boardSize: number) {
     this.size = boardSize;
-    this.unmarkedNodes = [Array(this.size).fill([]), Array(this.size).fill([])];
+    this.unmarkedNodes = [
+      Array(this.size)
+        .fill(0)
+        .map(_ => []),
+      Array(this.size)
+        .fill(0)
+        .map(_ => []),
+    ];
     this.buildNewBoard();
   }
 
@@ -33,7 +40,7 @@ export default class Board implements BoardInterface {
     return this.unmarkedNodes[0][index];
   }
 
-  public getUnregisteredColumnNodes(index: number): NodeInterface[] {
+  public getUnmarkedColumnNodes(index: number): NodeInterface[] {
     return this.unmarkedNodes[1][index];
   }
 

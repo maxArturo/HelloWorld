@@ -34,7 +34,7 @@ export default class ConstraintMatrix {
 
     // our first-order elements in the matrix will be the row options themselves.
     const matrix = Array(this.board.size ** 3)
-      .fill([])
+      .fill(null)
       .map((_, i) => {
         // add cell constraints
         const cellConstraints = Array(this.board.size ** 2).fill(0);

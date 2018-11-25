@@ -44,10 +44,12 @@ export default class BoardBuilder {
   }
 
   private processNode(): void {
-    if (this.canBeMarked(this.currIndex)) {
-      const node = this.board.nodeAt(this.currIndex);
-      if (this.isNode(node)) {
+    const node = this.board.nodeAt(this.currIndex);
+    if (this.isNode(node)) {
+      if (this.canBeMarked(this.currIndex)) {
         this.markNode(node);
+      } else {
+        this.board.registerUnmarkedNode(node);
       }
     }
   }

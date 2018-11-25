@@ -3,6 +3,7 @@ import ConstraintMatrix, {
   ConstraintMatrixInterface,
 } from './ConstraintMatrix';
 import { sample, shuffle } from 'lodash';
+import { NodeInterface } from './Node';
 
 const solver = require('dlxlib');
 
@@ -24,13 +25,30 @@ export default class ConstraintSolver {
       shuffle(Array.from(new Array(board.size).keys())),
     ];
 
+    const markedNodes: NodeInterface[] = [];
     solution.map(el => {
       const x = rowColshuffling[0][Math.trunc(el / board.size ** 2)];
       const y = rowColshuffling[1][Math.trunc(el / board.size) % board.size];
 
       const node = board.nodeAt([x, y]);
       if (node) {
-        node.solutionNumber = ((el % board.size) + 1).toString();
+        if (node.marked) {
+          markedNodes.push(node);
+        } else {
+          node.solutionNumber = ((el % board.size) + 1).toString();
+        }
+      }
+    });
+
+    markedNodes.map(node => {
+      const repeatedSolution = sample(
+        board
+          .getUnmarkedRowNodes(node.x)
+          .concat(board.getUnmarkedColumnNodes(node.y)),
+      );
+
+      if (repeatedSolution) {
+        node.solutionNumber = repeatedSolution.solutionNumber;
       }
     });
   }
