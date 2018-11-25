@@ -16,7 +16,13 @@ export default class BoardBuilder {
     this.currIndex = [0, 0];
   }
 
-  public traverseStep() {
+  public solve() {
+    while (!this.completed) {
+      this.traverseStep();
+    }
+  }
+
+  private traverseStep() {
     if (!this.completed) {
       this.processNode();
       this.setNextIndex();

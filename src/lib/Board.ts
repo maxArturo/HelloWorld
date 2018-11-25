@@ -7,23 +7,35 @@ export interface BoardInterface {
   state: Map<String, NodeInterface>;
   size: number;
   nodeAt: (input: number[]) => NodeInterface | void;
-  getRowNodes(index: number): NodeInterface[] | void;
-  getColumnNodes(index: number): NodeInterface[] | void;
+  registerUnmarkedNode(node: NodeInterface): void;
+  getUnmarkedRowNodes(index: number): NodeInterface[];
+  getUnregisteredColumnNodes(index: number): NodeInterface[];
 }
 
 export default class Board implements BoardInterface {
   public state: Map<String, NodeInterface>;
   public filled: boolean;
   public size: number;
+  private unmarkedNodes: NodeInterface[][][];
 
   constructor(public boardSize: number) {
     this.size = boardSize;
-    Array(this.size).fill([]);
+    this.unmarkedNodes = [Array(this.size).fill([]), Array(this.size).fill([])];
     this.buildNewBoard();
   }
 
-  public getRowNodes(index: number): NodeInterface[] | void {}
-  public getColumnNodes() {}
+  public registerUnmarkedNode(node: NodeInterface): void {
+    this.unmarkedNodes[0][node.x].push(node);
+    this.unmarkedNodes[1][node.y].push(node);
+  }
+
+  public getUnmarkedRowNodes(index: number): NodeInterface[] {
+    return this.unmarkedNodes[0][index];
+  }
+
+  public getUnregisteredColumnNodes(index: number): NodeInterface[] {
+    return this.unmarkedNodes[1][index];
+  }
 
   public nodeAt([x, y]: number[]): NodeInterface | void {
     return this.state.get(`${x},${y}`);

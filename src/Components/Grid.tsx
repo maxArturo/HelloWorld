@@ -19,7 +19,6 @@ export default class Grid extends React.Component<
 > {
   private board: Board;
   private boardBuilder: BoardBuilder;
-  private runAll = true;
 
   constructor(props: GridPropsInterface) {
     super(props);
@@ -35,11 +34,7 @@ export default class Grid extends React.Component<
     this.board = new Board(boardSize);
     this.boardBuilder = new BoardBuilder(this.board);
 
-    if (this.runAll) {
-      while (!this.boardBuilder.completed) {
-        this.boardBuilder.traverseStep();
-      }
-    }
+    this.boardBuilder.solve();
     this.fillInNumbers();
   }
 
